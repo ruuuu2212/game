@@ -2,11 +2,11 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>マリオ風ゲーム 修正版</title>
+<title>かわいいマリオ風ゲーム</title>
 <style>
 body {
     margin: 0;
-    background: skyblue;
+    background: #aee1ff;
 }
 
 #game {
@@ -14,48 +14,99 @@ body {
     width: 800px;
     height: 400px;
     margin: auto;
-    background: linear-gradient(skyblue, lightgreen);
-    border: 3px solid black;
     overflow: hidden;
+    border-radius: 20px;
+    border: 4px solid white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    background: linear-gradient(#aee1ff, #e0f7ff);
 }
 
+/* ☁️ 雲 */
+.cloud {
+    position: absolute;
+    width: 80px;
+    height: 50px;
+    background: white;
+    border-radius: 50px;
+}
+
+.cloud::before,
+.cloud::after {
+    content: "";
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+}
+
+.cloud::before {
+    width: 50px;
+    height: 50px;
+    top: -20px;
+    left: 10px;
+}
+
+.cloud::after {
+    width: 60px;
+    height: 60px;
+    top: -25px;
+    left: 30px;
+}
+
+/* 🌈 プレイヤー */
 #player {
     position: absolute;
     width: 40px;
     height: 40px;
-    background: red;
+    background: pink;
+    border-radius: 50%;
+    border: 3px solid white;
 }
 
+/* 👾 敵 */
 .enemy {
     position: absolute;
     width: 40px;
     height: 40px;
-    background: purple;
+    background: plum;
+    border-radius: 50%;
+    border: 3px solid white;
 }
 
+/* 🏁 ゴール */
 #goal {
     position: absolute;
     width: 40px;
     height: 80px;
-    background: gold;
+    background: linear-gradient(pink, gold);
+    border-radius: 10px;
 }
 
+/* 🌱 地面 */
 .ground {
     position: absolute;
     width: 100%;
-    height: 50px;
-    background: green;
+    height: 60px;
+    background: #8ee4af;
     bottom: 0;
+    border-top: 4px solid #5ccf8a;
 }
 </style>
 </head>
 <body>
 
 <div id="game">
+
+    <!-- ☁️ 雲 -->
+    <div class="cloud" style="top:50px; left:100px;"></div>
+    <div class="cloud" style="top:80px; left:500px;"></div>
+
     <div id="player"></div>
-    <div class="enemy" style="left:400px; bottom:50px;"></div>
-    <div class="enemy" style="left:650px; bottom:50px;"></div>
-    <div id="goal" style="right:20px; bottom:50px;"></div>
+
+    <div class="enemy" style="left:400px; top:310px;"></div>
+    <div class="enemy" style="left:650px; top:310px;"></div>
+
+    <div id="goal" style="right:20px; top:260px;"></div>
+
     <div class="ground"></div>
 </div>
 
@@ -63,7 +114,7 @@ body {
 const player = document.getElementById("player");
 
 let x = 50;
-let y = 310; // ←ここ重要（地面の上に配置）
+let y = 310;
 let velocityY = 0;
 let isJumping = false;
 
@@ -73,21 +124,17 @@ document.addEventListener("keydown", e => keys[e.code] = true);
 document.addEventListener("keyup", e => keys[e.code] = false);
 
 function gameLoop() {
-    // 左右移動
     if (keys["ArrowRight"]) x += 5;
     if (keys["ArrowLeft"]) x -= 5;
 
-    // ジャンプ
     if (keys["Space"] && !isJumping) {
         velocityY = -15;
         isJumping = true;
     }
 
-    // 重力
     velocityY += 0.8;
     y += velocityY;
 
-    // 地面判定
     if (y >= 310) {
         y = 310;
         isJumping = false;
