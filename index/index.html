@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>マリオ風ゲーム 修正版</title>
+<style>
+body {
+    margin: 0;
+    background: skyblue;
+}
+
+#game {
+    position: relative;
+    width: 800px;
+    height: 400px;
+    margin: auto;
+    background: linear-gradient(skyblue, lightgreen);
+    border: 3px solid black;
+    overflow: hidden;
+}
+
+#player {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: red;
+}
+
+.enemy {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: purple;
+}
+
+#goal {
+    position: absolute;
+    width: 40px;
+    height: 80px;
+    background: gold;
+}
+
+.ground {
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    background: green;
+    bottom: 0;
+}
+</style>
+</head>
+<body>
+
+<div id="game">
+    <div id="player"></div>
+    <div class="enemy" style="left:400px; bottom:50px;"></div>
+    <div class="enemy" style="left:650px; bottom:50px;"></div>
+    <div id="goal" style="right:20px; bottom:50px;"></div>
+    <div class="ground"></div>
+</div>
+
+<script>
+const player = document.getElementById("player");
+
+let x = 50;
+let y = 310; // ←ここ重要（地面の上に配置）
+let velocityY = 0;
+let isJumping = false;
+
+let keys = {};
+
+document.addEventListener("keydown", e => keys[e.code] = true);
+document.addEventListener("keyup", e => keys[e.code] = false);
+
+function gameLoop() {
+    // 左右移動
+    if (keys["ArrowRight"]) x += 5;
+    if (keys["ArrowLeft"]) x -= 5;
+
+    // ジャンプ
+    if (keys["Space"] && !isJumping) {
+        velocityY = -15;
+        isJumping = true;
+    }
+
+    // 重力
+    velocityY += 0.8;
+    y += velocityY;
+
+    // 地面判定
+    if (y >= 310) {
+        y = 310;
+        isJumping = false;
+    }
+
+    player.style.left = x + "px";
+    player.style.top = y + "px";
+
+    checkCollision();
+
+    requestAnimationFrame(gameLoop);
+}
+
+function checkCollision() {
+    const playerRect = player.getBoundingClientRect();
+
+    document.querySelectorAll(".enemy").forEach(enemy => {
+        const rect = enemy.getBoundingClientRect();
+        if (isColliding(playerRect, rect)) {
+            alert("ゲームオーバー！");
+            location.reload();
+        }
+    });
+
+    const goal = document.getElementById("goal").getBoundingClientRect();
+    if (isColliding(playerRect, goal)) {
+        alert("クリア！！！");
+        location.reload();
+    }
+}
+
+function isColliding(a, b) {
+    return !(
+        a.top > b.bottom ||
+        a.bottom < b.top ||
+        a.right < b.left ||
+        a.left > b.right
+    );
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
